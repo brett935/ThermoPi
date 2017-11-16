@@ -1,0 +1,27 @@
+{
+  "name": "thermopi",
+  "version": "1.0.0",
+  "description": "Raspberry Pi based smart thermostat",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.16.2",
+    "jquery": "^3.2.1",
+    "onoff": "^1.1.8",
+    "socket.io": "^2.0.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "t",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brett935/ThermoPi.git"
+  },
+  "author": "Brett Napier",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/brett935/ThermoPi/issues"
+  },
+  "homepage": "https://github.com/brett935/ThermoPi#readme"
+}
