@@ -1,59 +1,108 @@
-<!doctype html>  
-<html lang="en">  
+<!doctype html>
+<html lang="en">
   <head>
     <script src="/jquery/dist/jquery.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   </head>
   <body>
-    <h1>Dashboard</h1>
-    
-    <div class="container">
-     <span class="label-text">Temp</span>
-     <div class="pie-wrapper">
-      <div class="arc" id="temp2" data-value="24"></div>
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">ThermoPi</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="#">Dashboard</a></li>
+          <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Dropdown 1 <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Page 1-1</a></li>
+            <li><a href="#">Page 1-2</a></li>
+            <li><a href="#">Page 1-3</a></li>
+          </ul>
+        </li>
+        <li><a href="#">Page 1</a></li>
+        <li><a href="#">Page 2</a></li>
+        <li><a href="#">Page 3</a></li>
+      </ul>
+    </div>
+  </nav>
+  <div class="row">
+    <div class="col-sm-3">
+      <p class="text-center">Temperature</p>
+      <div class="pie-wrapper">
+        <div class="arc" id="temp2" data-value="24"></div>
         <span class="score" id="temp">24%</span>
       </div>
     </div>
-
-      <div class="container">
-        <p>Mode:</p>
-        <form action="">
-          <input type="radio" name="mode" value="heat"> Heat<br>
-          <input type="radio" name="mode" value="off"> Off<br>
-          <input type="radio" name="mode" value="ac"> AC
-        </form>
+    
+    <div class="col-sm-3">
+      <p>Function:</p>
+      <div>
+        <input type="radio" name="function" value="single"> Single<br>
+        <input type="radio" name="function" value="dual"> Dual<br>
       </div>
-
-      <div class="container">
+    </div>
+    <div class="col-sm-3">
+      <div>
         <p>Fan:</p>
-        <form action="">
-          <input type="radio" name="fanMode" value="auto"> Auto<br>
-          <input type="radio" name="fanMode" value="off"> Off<br>
-        </form>
+        <input type="radio" name="fanMode" value="auto"> Auto<br>
+        <input type="radio" name="fanMode" value="on"> On<br>
       </div>
-
-      <div class="container">
-        <p>Function:</p>
-        <form action="">
-          <input type="radio" name="function" value="single"> Single<br>
-          <input type="radio" name="function" value="dual"> Dual<br>
-        </form>
+    </div>
+    <div class="col-sm-3">
+      <div id="modeList">
+        <p>Mode:</p>
+        <input type="radio" name="mode" value="heat"> Heat<br>
+        <input type="radio" name="mode" value="off"> Off<br>
+        <input type="radio" name="mode" value="ac"> AC
       </div>
-    <button id="clickButton">Fan On</button>
-  </body>
-</html>  
+    </div>
+  </div>
+</body>
+</html>
 
 <script>  
   var socket = io.connect('localhost:5200');
   socket.on('connect', function(data) {
-    socket.emit('join', 'Client connected!');
+    socket.emit('join');
   });
 
   socket.on('updateTemp', function(data) {
     $('#temp').html(data + "&deg;F");
     $('#temp2').attr("data-value", data); 
   });
-  $('#clickButton').click(function(){socket.emit('fanOn')});
+
+  //TODO: push button changes so if one client changes button state others will update
+  $('input[type=radio][name=mode]').change(function() {
+    if(this.value == "heat") {
+      socket.emit('setModeHeat');
+    }
+    else if(this.value == "off") {
+      socket.emit('setModeOff');
+    }
+    else if(this.value == "ac") {
+      socket.emit('setModeAC');
+    }
+  });
+  $('input[type=radio][name=fanMode]').change(function() {
+    if(this.value == "auto") {
+      socket.emit('setFanAuto');
+    }
+    else if(this.value == "on") {
+      socket.emit('setFanOn');
+    }
+  });
+  $('input[type=radio][name=function]').change(function() {
+    if(this.value == "single") {
+      socket.emit('setFunctionSingle');
+      $("#modeList" ).show();
+    }
+    else if(this.value == "dual") {
+      socket.emit('setFunctionDual');
+      $("#modeList" ).hide();
+    }
+  });
 </script>  
 
 

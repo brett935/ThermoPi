@@ -32,13 +32,14 @@ class Thermostat {
     console.log("Setting up thermostat!");
     let HVACType = "conventional"; // "heat pump"
     let mode = "single"; // "single", "dual"
-    let switchMode = "heat"; // "heat" or "ac"
+    let switchMode = "heat"; // "heat", "ac" or "off"
+    let indoorBlowerFan = "on"; // "on" or "auto"
     let currentTemperature = 69;
     let desiredTemperature = 72;
 
     //for dual mode
-    let lowTempLimit = 65;
-    let highTempLimit = 76;
+    let lowTempLimit = 69;
+    let highTempLimit = 72;
     //toleranceInterval (for energy effeciency)
 
 
@@ -58,15 +59,54 @@ class Thermostat {
       else if(mode == "single") {
         if(switchMode == "ac") {
           if(currentTemperature > desiredTemperature) {
+            //heatOff
             acOn();
           }
         }
         else if(switchMode == "heat") {
           if(currentTemperature < desiredTemperature) {
+            //acOff
             heatOn();
           }
         }
+        else if(switchMode == "off") {
+          //heatOff
+          //acOff
+        }
       }
+    }
+
+    //button controls
+    this.setModeAC = function () {
+      switchMode = "ac";
+      logButtonChange(switchMode);
+    }
+    this.setModeHeat = function () {
+      switchMode = "heat";
+      logButtonChange(switchMode);
+    }
+    this.setModeOff = function () {
+      switchMode = "off";
+      logButtonChange(switchMode);
+    }
+    this.setFunctionSingle = function () {
+      mode = "single";
+      logButtonChange(mode);
+    }
+    this.setFunctionDual = function () {
+      mode = "dual";
+      logButtonChange(mode);
+    }
+    this.setFanOn = function () {
+      indoorBlowerFan = "on";
+      logButtonChange(indoorBlowerFan);
+    }
+    this.setFanAuto = function () {
+      indoorBlowerFan = "auto";
+      logButtonChange(indoorBlowerFan);
+    }
+    let logButtonChange = function(value) {
+      console.log("Changed to: " + value);
     }
 
     let acOn = function() {
@@ -136,16 +176,33 @@ app.get('/', function(req, res,next) {
 io.on('connection', function(client) {  
     console.log('Client connected...');
 
-    // client.on('fanOn', function() {
-    //   thermostat.fanOn();
-    // })
-    
+    client.on('setModeAC', function() {
+      thermostat.setModeAC();
+    })
+    client.on('setModeHeat', function() {
+      thermostat.setModeHeat();
+    })
+    client.on('setModeOff', function() {
+      thermostat.setModeOff();
+    })
+    client.on('setFanOn', function() {
+      thermostat.setFanOn();
+    })
+    client.on('setFanAuto', function() {
+      thermostat.setFanAuto();
+    })
+    client.on('setFunctionSingle', function() {
+      thermostat.setFunctionSingle();
+    })
+    client.on('setFunctionDual', function() {
+      thermostat.setFunctionDual();
+    })
+
     setInterval(function myTimer3() {
       client.emit('updateTemp', thermostat.getCurrentTemperature());
     }, 1000);
     
 
 });
-
 server.listen(5200);  
 // END SERVER CODE
