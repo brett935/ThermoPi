@@ -27,15 +27,15 @@
 // var Gpio = require('onoff').Gpio
 // var white = new Gpio(4, 'out');
 
-class Thermostat {
+module.exports = class Thermostat {
   constructor() {
     console.log("Setting up thermostat!");
     let HVACType = "conventional"; // "heat pump"
     let mode = "single"; // "single", "dual"
-    let switchMode = "heat"; // "heat", "ac" or "off"
+    let switchMode = "off"; // "heat", "ac" or "off"
     let indoorBlowerFan = "on"; // "on" or "auto"
-    let currentTemperature = 69;
-    let desiredTemperature = 72;
+    let currentTemperature = 70;
+    let desiredTemperature = 70;
 
     //for dual mode
     let lowTempLimit = 69;
@@ -105,6 +105,18 @@ class Thermostat {
       indoorBlowerFan = "auto";
       logButtonChange(indoorBlowerFan);
     }
+    this.setDesiredTemperature = function(desiredTemp) {
+      console.log("Desired Temperature set to: " + desiredTemp);
+      desiredTemperature = arguments[0];
+    }
+    this.setLowTemperatureLimit = function(lowTemp) {
+      console.log("Low Temperature set to: " + lowTemp);
+      lowTempLimit = arguments[0];
+    }
+    this.setHighTemperatureLimit = function(highTemp) {
+      console.log("High Temperature set to: " + highTemp);
+      highTempLimit = arguments[0];
+    }
     let logButtonChange = function(value) {
       console.log("Changed to: " + value);
     }
@@ -145,64 +157,3 @@ class Thermostat {
     }
   }
 }
-
-thermostat = new Thermostat();
-
-let myVar = setInterval(myTimer ,200);
-function myTimer() {
-    thermostat.decideFunction();
-    thermostat.logCurrentTemperature();
-
-} 
-let myVar2 = setInterval(simulateTemperatureFluctuation, 2000);
-function simulateTemperatureFluctuation() {
-  thermostat.randomTemperatureChange();
-}
-
-
-// SERVER CODE
-// http://www.programwitherik.com/getting-started-with-socket-io-node-js-and-express/
-var express = require('express');  
-var app = express();  
-var server = require('http').createServer(app);  
-var io = require('socket.io')(server);
-
-app.use(express.static(__dirname + '/node_modules'));  
-app.get('/', function(req, res,next) {  
-    res.sendFile(__dirname + '/index.html');
-});
-
-
-io.on('connection', function(client) {  
-    console.log('Client connected...');
-
-    client.on('setModeAC', function() {
-      thermostat.setModeAC();
-    })
-    client.on('setModeHeat', function() {
-      thermostat.setModeHeat();
-    })
-    client.on('setModeOff', function() {
-      thermostat.setModeOff();
-    })
-    client.on('setFanOn', function() {
-      thermostat.setFanOn();
-    })
-    client.on('setFanAuto', function() {
-      thermostat.setFanAuto();
-    })
-    client.on('setFunctionSingle', function() {
-      thermostat.setFunctionSingle();
-    })
-    client.on('setFunctionDual', function() {
-      thermostat.setFunctionDual();
-    })
-
-    setInterval(function myTimer3() {
-      client.emit('updateTemp', thermostat.getCurrentTemperature());
-    }, 1000);
-    
-
-});
-server.listen(5200);  
-// END SERVER CODE

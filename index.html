@@ -21,9 +21,9 @@
             <li><a href="#">Page 1-3</a></li>
           </ul>
         </li>
-        <li><a href="#">Page 1</a></li>
-        <li><a href="#">Page 2</a></li>
-        <li><a href="#">Page 3</a></li>
+        <li><a href="#">Sensors</a></li>
+        <li><a href="#">Log</a></li>
+        <li><a href="#">Settings</a></li>
       </ul>
     </div>
   </nav>
@@ -56,6 +56,20 @@
         <input type="radio" name="mode" value="heat"> Heat<br>
         <input type="radio" name="mode" value="off"> Off<br>
         <input type="radio" name="mode" value="ac"> AC
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-3">
+      <label for="desiredTemperature">Desired Temperature:</label>
+      <input type="number" name="desiredTemperature">
+    </div>
+    <div class="col-sm-3">
+      <div id="temperatureLimits">
+        <label for="lowTemperatureLimit">Low Temperature Limit:</label>
+        <input type="number" name="lowTemperatureLimit">
+        <label for="lowTemperatureLimit">High Temperature Limit:</label>
+        <input type="number" name="highTemperatureLimit">
       </div>
     </div>
   </div>
@@ -97,11 +111,22 @@
     if(this.value == "single") {
       socket.emit('setFunctionSingle');
       $("#modeList" ).show();
+      $("#temperatureLimits").hide();
     }
     else if(this.value == "dual") {
       socket.emit('setFunctionDual');
       $("#modeList" ).hide();
+      $("#temperatureLimits").show();
     }
+  });
+  $('input[type=number][name=desiredTemperature]').change(function() {
+    socket.emit('setDesiredTemperature', this.value);;
+  });
+  $('input[type=number][name=lowTemperatureLimit]').change(function() {
+    socket.emit('setLowTemperatureLimit', this.value);;
+  });
+  $('input[type=number][name=highTemperatureLimit]').change(function() {
+    socket.emit('setHighTemperatureLimit', this.value);;
   });
 </script>  
 
